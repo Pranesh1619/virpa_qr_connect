@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Consolidated notes/address if passed separately
+    // Consolidated notes/address
     const extraParts = [];
-    if (message && message.trim()) extraParts.push(message.trim());
-    if (notes && notes.trim()) extraParts.push(`Notes: ${notes.trim()}`);
+    const noteText = (notes || message || "").trim();
+    if (noteText) extraParts.push(noteText);
     if (address && address.trim()) extraParts.push(`Address: ${address.trim()}`);
 
     await appendLeadToSheet({

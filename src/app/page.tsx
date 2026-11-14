@@ -51,18 +51,13 @@ export default function HomePage() {
               priority
             />
           </div>
-          <span style={{ fontSize: "16px", fontWeight: "700", color: "#17191D", letterSpacing: "-0.2px" }}>
-            Virpa Scanner
+          <span style={{ fontSize: "20px", fontWeight: "700", color: "#17191D", letterSpacing: "-0.2px" }}>
+            Virpa Connect
           </span>
+          <p style={{ fontSize: "13.5px", color: "#667085", margin: "6px 0 0 0" }}>
+            Scan this QR code with your phone camera to share your contact details.
+          </p>
         </div>
-
-        {/* Title & Instructions */}
-        <h1 style={{ fontSize: "21px", fontWeight: "700", color: "#17191D", margin: "0 0 6px 0" }}>
-          Virpa Connect
-        </h1>
-        <p style={{ fontSize: "13.5px", color: "#667085", margin: "0 0 24px 0" }}>
-          Scan this QR code with your phone camera to share your contact details.
-        </p>
 
         {/* Clean QR Code Container */}
         <div

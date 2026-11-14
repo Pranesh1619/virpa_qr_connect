@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { CheckCircle2, AlertCircle, Building2, User, Phone, Mail, Briefcase, Globe } from "lucide-react";
+import { CheckCircle2, AlertCircle, Building2, User, Phone, Mail, FileText } from "lucide-react";
 
 export default function FormPage() {
   const [formData, setFormData] = useState({
@@ -10,9 +10,7 @@ export default function FormPage() {
     phone: "",
     email: "",
     company: "",
-    designation: "",
-    website: "",
-    message: "",
+    notes: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -35,7 +33,10 @@ export default function FormPage() {
       const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          message: formData.notes,
+        }),
       });
 
       const result = await res.json();
@@ -58,9 +59,7 @@ export default function FormPage() {
       phone: "",
       email: "",
       company: "",
-      designation: "",
-      website: "",
-      message: "",
+      notes: "",
     });
     setSubmitted(false);
     setError(null);
@@ -94,8 +93,8 @@ export default function FormPage() {
               priority
             />
           </div>
-          <span style={{ fontSize: "16px", fontWeight: "700", color: "#17191D", letterSpacing: "-0.2px" }}>
-            Virpa Scanner
+          <span style={{ fontSize: "18px", fontWeight: "700", color: "#17191D", letterSpacing: "-0.2px" }}>
+            Virpa Connect
           </span>
         </div>
 
@@ -252,62 +251,25 @@ export default function FormPage() {
                 </div>
               </div>
 
-              {/* Designation / Role */}
+              {/* Notes */}
               <div>
                 <label style={{ display: "block", fontSize: "12.5px", fontWeight: "600", color: "#17191D", marginBottom: "6px" }}>
-                  Designation / Job Title
+                  Notes <span style={{ color: "#98A2B3", fontWeight: "normal" }}>(Optional)</span>
                 </label>
                 <div style={{ position: "relative" }}>
-                  <div style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#98A2B3", pointerEvents: "none", display: "flex", alignItems: "center" }}>
-                    <Briefcase style={{ width: 16, height: 16 }} />
+                  <div style={{ position: "absolute", left: "12px", top: "12px", color: "#98A2B3", pointerEvents: "none", display: "flex", alignItems: "center" }}>
+                    <FileText style={{ width: 16, height: 16 }} />
                   </div>
-                  <input
-                    type="text"
-                    name="designation"
-                    value={formData.designation}
+                  <textarea
+                    name="notes"
+                    rows={3}
+                    value={formData.notes}
                     onChange={handleChange}
-                    placeholder="e.g. Director / Software Engineer"
+                    placeholder="Add any additional notes or requirements..."
                     className="virpa-input"
-                    style={{ paddingLeft: "36px" }}
+                    style={{ paddingLeft: "36px", resize: "none" }}
                   />
                 </div>
-              </div>
-
-              {/* Website */}
-              <div>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: "600", color: "#17191D", marginBottom: "6px" }}>
-                  Website
-                </label>
-                <div style={{ position: "relative" }}>
-                  <div style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#98A2B3", pointerEvents: "none", display: "flex", alignItems: "center" }}>
-                    <Globe style={{ width: 16, height: 16 }} />
-                  </div>
-                  <input
-                    type="text"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleChange}
-                    placeholder="e.g. www.company.com"
-                    className="virpa-input"
-                    style={{ paddingLeft: "36px" }}
-                  />
-                </div>
-              </div>
-
-              {/* Message */}
-              <div>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: "600", color: "#17191D", marginBottom: "6px" }}>
-                  Message / Remarks <span style={{ color: "#98A2B3", fontWeight: "normal" }}>(Optional)</span>
-                </label>
-                <textarea
-                  name="message"
-                  rows={3}
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Tell us what you are looking for..."
-                  className="virpa-input"
-                  style={{ resize: "none" }}
-                />
               </div>
 
               {/* Submit Button */}

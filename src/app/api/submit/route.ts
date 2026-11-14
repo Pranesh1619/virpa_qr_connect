@@ -4,7 +4,7 @@ import { appendLeadToSheet } from "@/lib/googleSheets";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { fullName, phone, email, company, designation, website, message, notes, address } = body;
+    const { fullName, phone, email, company, designation, website, message, notes, address, originalPhone } = body;
 
     // Validate required fields (Either Full Name or Company, plus Phone)
     const effectiveName = (fullName || company || "").trim();
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (noteText) extraParts.push(noteText);
     if (address && address.trim()) extraParts.push(`Address: ${address.trim()}`);
 
-    await appendLeadToSheet({
+    const result = await appendLeadToSheet({
       fullName: fullName ? fullName.trim() : (company ? company.trim() : "Lead"),
       phone,
       email: email || "",
@@ -29,11 +29,15 @@ export async function POST(req: NextRequest) {
       designation: designation || "",
       website: website || "",
       message: extraParts.join(" | "),
+      originalPhone: originalPhone || "",
     });
 
     return NextResponse.json({
       success: true,
-      message: "Lead saved successfully to Google Sheets!",
+      updated: result?.updated || false,
+      message: result?.updated
+        ? "Lead updated successfully in Google Sheets!"
+        : "Lead saved successfully to Google Sheets!",
     });
   } catch (error: any) {
     console.error("Error writing to Google Sheets:", error);

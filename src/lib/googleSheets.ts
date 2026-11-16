@@ -113,6 +113,18 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
     ],
   ];
 
+  // Find actual sheetId for formatting
+  let targetSheetId = 0;
+  try {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId });
+    const foundSheet = meta.data.sheets?.find(
+      (s) => s.properties?.title?.toLowerCase() === sheetName.toLowerCase()
+    );
+    if (foundSheet && foundSheet.properties?.sheetId !== undefined && foundSheet.properties?.sheetId !== null) {
+      targetSheetId = foundSheet.properties.sheetId;
+    }
+  } catch (_) {}
+
   if (existingRowIndex >= 1) {
     // UPDATE EXISTING ROW IN PLACE
     const rowNumber = existingRowIndex + 1;
@@ -125,16 +137,16 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
       },
     });
 
-    // Formatting in parallel
-    sheets.spreadsheets
-      .batchUpdate({
+    // Format row with font size 11, Arial, left-aligned
+    try {
+      await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: {
           requests: [
             {
               repeatCell: {
                 range: {
-                  sheetId: 0,
+                  sheetId: targetSheetId,
                   startRowIndex: existingRowIndex,
                   endRowIndex: existingRowIndex + 1,
                   startColumnIndex: 0,
@@ -144,7 +156,7 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
                   userEnteredFormat: {
                     textFormat: {
                       bold: false,
-                      fontSize: 10,
+                      fontSize: 11,
                       fontFamily: "Arial",
                     },
                     horizontalAlignment: "LEFT",
@@ -156,8 +168,10 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
             },
           ],
         },
-      })
-      .catch(() => {});
+      });
+    } catch (e) {
+      console.warn("Formatting updated row warning:", e);
+    }
 
     return { updated: true, row: rowNumber };
   } else {
@@ -179,15 +193,15 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
         const startRow = parseInt(match[1], 10) - 1;
         const endRow = parseInt(match[2], 10);
 
-        sheets.spreadsheets
-          .batchUpdate({
+        try {
+          await sheets.spreadsheets.batchUpdate({
             spreadsheetId,
             requestBody: {
               requests: [
                 {
                   repeatCell: {
                     range: {
-                      sheetId: 0,
+                      sheetId: targetSheetId,
                       startRowIndex: startRow,
                       endRowIndex: endRow,
                       startColumnIndex: 0,
@@ -197,7 +211,7 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
                       userEnteredFormat: {
                         textFormat: {
                           bold: false,
-                          fontSize: 10,
+                          fontSize: 11,
                           fontFamily: "Arial",
                         },
                         horizontalAlignment: "LEFT",
@@ -209,8 +223,10 @@ export async function appendLeadToSheet(data: LeadData): Promise<{ updated: bool
                 },
               ],
             },
-          })
-          .catch(() => {});
+          });
+        } catch (e) {
+          console.warn("Formatting appended row warning:", e);
+        }
       }
     }
 
